@@ -4,8 +4,15 @@ from django.http import HttpResponseRedirect
 from tasks.models import Task
 
 
-def pending_tasks():
-    return Task.objects.filter(deleted=False).filter(completed=False)
+def pending_tasks(search):
+    if search:
+        return (
+            Task.objects.filter(deleted=False)
+            .filter(completed=False)
+            .filter(title__icontains=search)
+        )
+    else:
+        return Task.objects.filter(deleted=False).filter(completed=False)
 
 
 def completed_tasks():
@@ -21,7 +28,7 @@ def tasks_view(request):
         request,
         "tasks.html",
         {
-            "pending_tasks": pending_tasks(),
+            "pending_tasks": pending_tasks(request.GET.get("search")),
         },
     )
 
